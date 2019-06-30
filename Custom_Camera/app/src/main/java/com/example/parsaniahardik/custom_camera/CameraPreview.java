@@ -1,33 +1,53 @@
 package com.example.parsaniahardik.custom_camera;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageView;
+
+import static java.lang.Math.random;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    ImageView iv;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera,ImageView img_view) {
         super(context);
         mCamera = camera;
         mHolder = getHolder();
+        iv = img_view;
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
+//        try {
+//            // create the surface and start camera preview
+//            if (mCamera == null) {
+//                mCamera.setPreviewDisplay(holder);
+//                mCamera.startPreview();
+//            }
+//        } catch (IOException e) {
+//            Log.d(VIEW_LOG_TAG, "Error setting camera preview: " + e.getMessage());
+//        }
         mCamera.setPreviewCallback(previewCallback);
+
     }
 
 
@@ -36,14 +56,37 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         @Override
         public void onPreviewFrame(byte[] data,Camera cam)
         {
-            Camera.Size previewSize = cam.getParameters().getPreviewSize();
+            Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
             YuvImage yuvImage = new YuvImage(data, ImageFormat.NV21,previewSize.width,previewSize.height, null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             yuvImage.compressToJpeg(new Rect(0,0,previewSize.width,previewSize.height),80,baos);
             byte[] jdata = baos.toByteArray();
+
             Bitmap bitmap = BitmapFactory.decodeByteArray(jdata,0,jdata.length);
 //            System.out.print("Amira  "+jdata);
-            Log.d("amira", bitmap.toString());
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            String image_string;
+
+            image_string = Base64.encodeToString(jdata, Base64.DEFAULT);
+//            Log.d("height", String.valueOf(previewSize.height));
+//            Log.d("width", String.valueOf(previewSize.width));
+            Log.d("amira", image_string.toString());
+            iv.setImageBitmap(rotatedBitmap);
+//            FileOutputStream fos = null;
+//            try {
+//                fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/"+random()+".png");
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+//                fos.close();
+//                Log.d("amira", image_string.toString());
+//
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
         }
     };
     public void refreshCamera(Camera camera) {

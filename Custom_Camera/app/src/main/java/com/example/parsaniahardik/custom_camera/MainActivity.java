@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,13 +30,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ImageView iv = (ImageView) findViewById(R.id.iv);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         myContext = this;
 
         mCamera =  Camera.open();
         mCamera.setDisplayOrientation(90);
         cameraPreview = (LinearLayout) findViewById(R.id.cPreview);
-        mPreview = new CameraPreview(myContext, mCamera);
+        mPreview = new CameraPreview(myContext, mCamera,iv);
         cameraPreview.addView(mPreview);
 
 
