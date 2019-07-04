@@ -19,18 +19,25 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.ImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static java.lang.Math.random;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
     ImageView iv;
+    boolean c ,p ,l;
 
     public CameraPreview(Context context, Camera camera,ImageView img_view) {
         super(context);
         mCamera = camera;
         mHolder = getHolder();
         iv = img_view;
+        c=true;
+        p=true;
+        l=true;
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -47,9 +54,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 //            Log.d(VIEW_LOG_TAG, "Error setting camera preview: " + e.getMessage());
 //        }
         mCamera.setPreviewCallback(previewCallback);
+        //mCamera.setPreviewCallbackWithBuffer(previewCallback);
 
     }
 
+
+
+    String image_string;
 
     private Camera.PreviewCallback  previewCallback= new Camera.PreviewCallback()
     {
@@ -60,19 +71,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             YuvImage yuvImage = new YuvImage(data, ImageFormat.NV21,previewSize.width,previewSize.height, null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             yuvImage.compressToJpeg(new Rect(0,0,previewSize.width,previewSize.height),80,baos);
-            byte[] jdata = baos.toByteArray();
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(jdata,0,jdata.length);
-//            System.out.print("Amira  "+jdata);
+            byte[] image_byte_array = baos.toByteArray();
+            JSONObject input = new JSONObject();
+            //image_string = Base64.encodeToString(image_byte_array, Base64.DEFAULT);
+            try {
+                input = buidJsonObject(image_byte_array, c, l, p);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Bitmap bitmap = BitmapFactory.decodeByteArray(image_byte_array,0,image_byte_array.length);
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            String image_string;
 
-            image_string = Base64.encodeToString(jdata, Base64.DEFAULT);
-//            Log.d("height", String.valueOf(previewSize.height));
-//            Log.d("width", String.valueOf(previewSize.width));
-            Log.d("amira", image_string.toString());
+            Log.d("amira", input.toString());
             iv.setImageBitmap(rotatedBitmap);
 //            FileOutputStream fos = null;
 //            try {
@@ -127,6 +139,17 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
         // TODO Auto-generated method stub
         // mCamera.release();
+    }
 
+
+    private JSONObject buidJsonObject(byte[] img,boolean car , boolean lane , boolean pedestrian) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("image", img);
+        jsonObject.put("car", car);
+        jsonObject.put("lane", lane);
+        jsonObject.put("pedestrian", pedestrian);
+
+        return jsonObject;
     }
 }
