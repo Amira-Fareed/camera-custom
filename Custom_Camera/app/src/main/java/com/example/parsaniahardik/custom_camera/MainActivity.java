@@ -10,6 +10,8 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,11 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private Camera.PictureCallback mPicture;
     private Context myContext;
     private LinearLayout cameraPreview;
-    private boolean cameraFront = false;
     public static Bitmap bitmap;
 
-    private static final int MY_CAMERA_REQUEST_CODE = 100;
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    //private static final int MY_CAMERA_REQUEST_CODE = 100;
+    //@RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +43,21 @@ public class MainActivity extends AppCompatActivity {
 
 
         buttons_listenner();
-        if (checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    MY_CAMERA_REQUEST_CODE);
-        }
+
+
+//        if (checkSelfPermission(Manifest.permission.CAMERA)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[]{Manifest.permission.CAMERA},
+//                    MY_CAMERA_REQUEST_CODE);
+//        }
+
         ImageView iv = (ImageView) findViewById(R.id.iv);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         myContext = this;
+
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+//        }
 
         mCamera =  Camera.open();
         mCamera.setDisplayOrientation(90);
@@ -61,26 +69,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    @Override
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == MY_CAMERA_REQUEST_CODE) {
-
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-
-            } else {
-
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
-
-            }
-
-        }}//end onRequestPermissionsResult
+//
+// @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        if (requestCode == 100) {
+//
+//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+//                Log.d("enabled1", "onRequestPermissionsResult: ");
+//
+//            } else {
+//
+//                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+//                Log.d("enabled2", "onRequestPermissionsResult: ");
+//
+//            }
+//
+//        }}//end onRequestPermissionsResult
 
     public void buttons_listenner() {
         ToggleButton car_toggle = (ToggleButton) findViewById(R.id.car_icon);

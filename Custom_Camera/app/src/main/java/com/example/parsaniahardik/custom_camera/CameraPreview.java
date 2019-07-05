@@ -76,7 +76,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setParameters(params);
             YuvImage yuvImage = new YuvImage(data, ImageFormat.NV21,previewSize.width,previewSize.height, null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            yuvImage.compressToJpeg(new Rect(0,0,previewSize.width,previewSize.height),80,baos);
+            yuvImage.compressToJpeg(new Rect(0,0,previewSize.width,previewSize.height),60,baos);
             byte[] image_byte_array = baos.toByteArray();
             JSONObject input = new JSONObject();
             //image_string = Base64.encodeToString(image_byte_array, Base64.DEFAULT);
