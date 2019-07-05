@@ -68,6 +68,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         public void onPreviewFrame(byte[] data,Camera cam)
         {
             Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
+            Camera.Parameters params = mCamera.getParameters();
+            if (params.getSupportedFocusModes().contains(
+                    Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+            }
+            mCamera.setParameters(params);
             YuvImage yuvImage = new YuvImage(data, ImageFormat.NV21,previewSize.width,previewSize.height, null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             yuvImage.compressToJpeg(new Rect(0,0,previewSize.width,previewSize.height),80,baos);
